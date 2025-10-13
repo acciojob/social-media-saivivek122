@@ -3,38 +3,47 @@ import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import "./../styles/App.css";
 
 export default function App() {
+  const navigate = useNavigate();
+
+  const [users] = useState(["User1", "User2", "User3"]);
   const [posts, setPosts] = useState([
-    { id: 1, title: "Hello World", author: "User1", content: "This is first post", reactions: [0,0,0,0,0] },
+    { id: 1, title: "Post 1", author: "User1", content: "Content 1", reactions: [0, 0, 0, 0, 0] },
+    { id: 2, title: "Post 2", author: "User2", content: "Content 2", reactions: [0, 0, 0, 0, 0] }
   ]);
   const [notifications, setNotifications] = useState([]);
-  const [users] = useState(["User1", "User2", "User3"]);
-  const navigate = useNavigate();
 
   const addPost = (e) => {
     e.preventDefault();
     const title = e.target.postTitle.value;
     const author = e.target.postAuthor.value;
     const content = e.target.postContent.value;
-    if(title && author && content){
-      setPosts([...posts, { id: posts.length+1, title, author, content, reactions: [0,0,0,0,0] }]);
+    if (title && author && content) {
+      const newPost = {
+        id: posts.length + 1,
+        title,
+        author,
+        content,
+        reactions: [0, 0, 0, 0, 0]
+      };
+      setPosts([...posts, newPost]);
       e.target.reset();
       navigate("/");
     }
   };
 
   const incrementReaction = (postId, index) => {
-    setPosts(posts.map(p => {
-      if(p.id === postId && index < 4){
-        const newReactions = [...p.reactions];
+    setPosts(posts.map(post => {
+      if (post.id === postId && index < 4) {
+        const newReactions = [...post.reactions];
         newReactions[index]++;
-        return {...p, reactions: newReactions};
+        return { ...post, reactions: newReactions };
       }
-      return p;
+      return post;
     }));
   };
 
   const updatePost = (id, title, content) => {
-    setPosts(posts.map(p => p.id === id ? {...p, title, content} : p));
+    setPosts(posts.map(post => post.id === id ? { ...post, title, content } : post));
     navigate("/");
   };
 
@@ -58,6 +67,7 @@ export default function App() {
               <textarea id="postContent" placeholder="Content"></textarea>
               <button type="submit" className="button">Add Post</button>
             </form>
+
             <div className="posts-list">
               {posts.map(post => (
                 <div key={post.id} className="post">
@@ -72,13 +82,15 @@ export default function App() {
               ))}
             </div>
           </div>
-        }/>
+        } />
 
         <Route path="/posts/:id" element={<EditPost posts={posts} updatePost={updatePost} />} />
 
         <Route path="/users" element={
-          <ul>{users.map((u,i) => <li key={i}>{u}</li>)}</ul>
-        }/>
+          <ul>
+            {users.map((user, idx) => <li key={idx}>{user}</li>)}
+          </ul>
+        } />
 
         <Route path="/notifications" element={
           <div>
@@ -87,7 +99,7 @@ export default function App() {
               {notifications.map((n,i) => <div key={i}>{n}</div>)}
             </section>
           </div>
-        }/>
+        } />
       </Routes>
     </div>
   );
