@@ -1,117 +1,192 @@
+// components/App.js
 import React, { useState } from "react";
-import { Routes, Route, useNavigate, useParams } from "react-router-dom";
-import "./../styles/App.css";
+import { BrowserRouter as Router, Routes, Route, useParams, Link, useNavigate } from "react-router-dom";
 
-export default function App() {
-  const navigate = useNavigate();
+const App = () => {
+  // Dummy data
+  const initialUsers = [
+    { id: 1, name: "Alice" },
+    { id: 2, name: "Bob" },
+    { id: 3, name: "Charlie" },
+  ];
 
-  const [users] = useState(["User1", "User2", "User3"]);
-  const [posts, setPosts] = useState([
-    { id: 1, title: "Post 1", author: "User1", content: "Content 1", reactions: [0,0,0,0,0] },
-    { id: 2, title: "Post 2", author: "User2", content: "Content 2", reactions: [0,0,0,0,0] }
-  ]);
+  const initialPosts = [
+    { id: 1, title: "First Post", author: "Alice", content: "Hello World", reactions: [0,0,0,0,0] },
+    { id: 2, title: "Second Post", author: "Bob", content: "React is cool!", reactions: [0,0,0,0,0] },
+  ];
+
+  const [users] = useState(initialUsers);
+  const [posts, setPosts] = useState(initialPosts);
   const [notifications, setNotifications] = useState([]);
 
-  const addPost = (e) => {
-    e.preventDefault();
-    const title = e.target.postTitle.value;
-    const author = e.target.postAuthor.value;
-    const content = e.target.postContent.value;
-    if(title && author && content) {
-      setPosts([...posts, {id: posts.length+1, title, author, content, reactions: [0,0,0,0,0]}]);
-      e.target.reset();
-      navigate("/");
-    }
+  const navigate = useNavigate();
+
+  // Add post
+  const addPost = (post) => {
+    setPosts([{ id: posts.length + 1, reactions: [0,0,0,0,0], ...post }, ...posts]);
   };
 
-  const incrementReaction = (postId, index) => {
-    setPosts(posts.map(post => {
-      if(post.id === postId && index < 4) {
-        const newReactions = [...post.reactions];
+  // Update post
+  const updatePost = (updated) => {
+    setPosts(posts.map(p => p.id === updated.id ? updated : p));
+  };
+
+  // Increase reaction count
+  const reactToPost = (postId, index) => {
+    setPosts(posts.map(p => {
+      if (p.id === postId && index < 4) {
+        const newReactions = [...p.reactions];
         newReactions[index]++;
-        return {...post, reactions: newReactions};
+        return { ...p, reactions: newReactions };
       }
-      return post;
+      return p;
     }));
   };
 
-  const updatePost = (id, title, content) => {
-    setPosts(posts.map(post => post.id === id ? {...post, title, content} : post));
-    navigate("/");
+  // Refresh notifications
+  const refreshNotifications = () => {
+    setNotifications(["New comment!", "Post liked!", "New follower!"]);
   };
 
-  const refreshNotifications = () => setNotifications(["Notification 1", "Notification 2"]);
+  // --- Components as inner functions ---
+
+  const LandingPage = () => (
+    <div>
+      <h2>All Posts</h2>
+      <div className="posts-list">
+        {posts.map((post) => (
+          <div key={post.id} className="post">
+            <h3>{post.title}</h3>
+            <p><b>Author:</b> {post.author}</p>
+            <p>{post.content}</p>
+            <div>
+              {post.reactions.map((r, i) => (
+                <button key={i} onClick={() => reactToPost(post.id, i)}>
+                  {i < 4 ? `❤️ ${r}` : `🚫 0`}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => navigate(`/edit/${post.id}`)}>Edit</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const UsersPage = () => (
+    <div>
+      <h2>Users</h2>
+      <ul>
+        {users.map(u => (
+          <li key={u.id}>
+            <a href={`/users/${u.id}`}>{u.name}</a>
+          </li>
+        ))}
+      </ul>
+
+      <Routes>
+        <Route path="/users/:id" element={<UserPosts />} />
+      </Routes>
+    </div>
+  );
+
+  const UserPosts = () => {
+    const { id } = useParams();
+    const user = users.find(u => u.id === parseInt(id));
+    const userPosts = posts.filter(p => p.author === user.name);
+    return (
+      <div>
+        <h3>Posts by {user.name}</h3>
+        {userPosts.map(p => (
+          <div key={p.id} className="post">
+            <h4>{p.title}</h4>
+            <p>{p.content}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const NotificationsPage = () => (
+    <div>
+      <h2>Notifications</h2>
+      <button className="button" onClick={refreshNotifications}>Refresh Notifications</button>
+      <section className="notificationsList">
+        {notifications.map((n, i) => <div key={i}>{n}</div>)}
+      </section>
+    </div>
+  );
+
+  const CreatePostPage = () => {
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState(users[0].name);
+    const [content, setContent] = useState("");
+
+    const handleSubmit = () => {
+      addPost({ title, author, content });
+      navigate("/");
+    };
+
+    return (
+      <div>
+        <h2>Create Post</h2>
+        <input id="postTitle" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
+        <select id="postAuthor" value={author} onChange={e => setAuthor(e.target.value)}>
+          {users.map(u => <option key={u.id}>{u.name}</option>)}
+        </select>
+        <textarea id="postContent" placeholder="Content" value={content} onChange={e => setContent(e.target.value)} />
+        <button onClick={handleSubmit}>Submit</button>
+      </div>
+    );
+  };
+
+  const EditPostPage = () => {
+    const { id } = useParams();
+    const post = posts.find(p => p.id === parseInt(id));
+    const [title, setTitle] = useState(post.title);
+    const [content, setContent] = useState(post.content);
+
+    const handleSave = () => {
+      updatePost({ ...post, title, content });
+      navigate("/");
+    };
+
+    return (
+      <div className="post">
+        <h2>Edit Post</h2>
+        <input id="postTitle" value={title} onChange={e => setTitle(e.target.value)} />
+        <textarea id="postContent" value={content} onChange={e => setContent(e.target.value)} />
+        <button onClick={handleSave}>Save</button>
+      </div>
+    );
+  };
 
   return (
     <div className="App">
       <h1>GenZ</h1>
-
-    <button className="button" onClick={() => updatePost(post.id, title, content)}>Save</button>
-        <a href="/">Posts</a>
-        <a href="/users">Users</a>
-        <a href="/notifications">Notifications</a>
-  
+      <nav>
+        <a href="/">Posts</a> | 
+        <a href="/users">Users</a> | 
+        <a href="/notifications">Notifications</a> | 
+        <a href="/create">Create Post</a>
+      </nav>
 
       <Routes>
-        <Route path="/" element={
-          <div>
-            <form onSubmit={addPost}>
-              <input id="postTitle" placeholder="Title"/>
-              <select id="postAuthor">{users.map(u => <option key={u}>{u}</option>)}</select>
-              <textarea id="postContent" placeholder="Content"></textarea>
-              <button type="submit" className="button">Add Post</button>
-            </form>
-
-            <div className="posts-list">
-              {posts.map(post => (
-                <div key={post.id} className="post">
-                  <h3>{post.title}</h3>
-                  <p>{post.content}</p>
-                  <p>Author: {post.author}</p>
-                  <div>
-                    {post.reactions.map((r,i) => <button key={i} onClick={() => incrementReaction(post.id,i)}>{r}</button>)}
-                  </div>
-                  <button className="button" onClick={() => navigate(`/posts/${post.id}`)}>Edit</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        }/>
-
-        <Route path="/posts/:id" element={<EditPost posts={posts} updatePost={updatePost}/>}/>
-
-        <Route path="/users" element={
-          <ul>
-            {users.map((user, idx) => <li key={idx}>{user}</li>)}
-                       <li></li>
-                       
-          </ul>
-        }/>
-
-        <Route path="/notifications" element={
-          <div>
-            <button className="button" onClick={refreshNotifications}>Refresh Notifications</button>
-            <section className="notificationsList">
-              {notifications.map((n,i) => <div key={i}>{n}</div>)}
-            </section>
-          </div>
-        }/>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/users/*" element={<UsersPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/create" element={<CreatePostPage />} />
+        <Route path="/edit/:id" element={<EditPostPage />} />
       </Routes>
     </div>
   );
-}
+};
 
-function EditPost({posts, updatePost}) {
-  const {id} = useParams();
-  const post = posts.find(p => p.id === parseInt(id));
-  const [title, setTitle] = useState(post?.title || "");
-  const [content, setContent] = useState(post?.content || "");
-
+// Wrap App with Router
+export default function AppWrapper() {
   return (
-    <div className="post">
-      <input id="postTitle" value={title} onChange={e => setTitle(e.target.value)}/>
-      <textarea id="postContent" value={content} onChange={e => setContent(e.target.value)}/>
-      <button className="button" onClick={() => updatePost(post.id, title, content)}>Save</button>
-    </div>
+    <Router>
+      <App />
+    </Router>
   );
 }
