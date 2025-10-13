@@ -27,15 +27,11 @@ export default function App() {
   };
 
   return (
-    <div>
-      <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">GenZ</h1>
-        <nav>
-          <Link to="/" className="mr-4">Posts</Link>
-          <Link to="/users" className="mr-4">Users</Link>
-          <Link to="/notifications" className="mr-4">Notifications</Link>
-        </nav>
-      </header>
+    <div className="App">
+      <h1>GenZ</h1>
+      <nav>
+        <a href="/">Posts</a> | <a href="/users">Users</a> | <a href="/notifications">Notifications</a>
+      </nav>
 
       <Routes>
         <Route path="/" element={<Home posts={posts} users={users} addPost={addPost} updatePost={updatePost} />} />
@@ -49,9 +45,9 @@ export default function App() {
 
 function Home({ posts, users, addPost, updatePost }) {
   return (
-    <div className="mt-6 grid grid-cols-2 gap-6">
+    <div className="home-container">
       <CreatePost users={users} onAdd={addPost} />
-      <div className="posts-list border p-4 rounded">
+      <div className="posts-list">
         {posts.slice(1).map((post) => (
           <PostCard key={post.id} post={post} users={users} onUpdate={updatePost} />
         ))}
@@ -74,13 +70,13 @@ function CreatePost({ users, onAdd }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 p-4 border rounded">
-      <input id="postTitle" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="block w-full border p-2" />
-      <select id="postAuthor" value={author} onChange={(e) => setAuthor(e.target.value)} className="block w-full border p-2">
+    <form onSubmit={handleSubmit}>
+      <input id="postTitle" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
+      <select id="postAuthor" value={author} onChange={(e) => setAuthor(e.target.value)}>
         {users.map((u) => (<option key={u.id} value={u.id}>{u.name}</option>))}
       </select>
-      <textarea id="postContent" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Content" className="block w-full border p-2" />
-      <button type="submit" className="button px-4 py-2 rounded bg-slate-200">Add Post</button>
+      <textarea id="postContent" value={content} onChange={(e) => setContent(e.target.value)} />
+      <button type="submit" className="button">Add Post</button>
     </form>
   );
 }
@@ -101,19 +97,19 @@ function PostCard({ post, users, onUpdate }) {
   };
 
   return (
-    <article className="post border p-3 mb-3 rounded">
+    <div className="post">
       <h3>{post.title}</h3>
-      <div className="text-sm text-gray-600">by {author}</div>
+      <div>by {author}</div>
       <p>{post.content}</p>
-      <div className="mt-3 flex items-center gap-2">
+      <div>
         {reactions.map((count, i) => (
-          <button key={i} className="px-2 py-1 border rounded" onClick={() => inc(i)}>
-            {i < 4 ? `${count}` : "0"}
+          <button key={i} onClick={() => inc(i)}>
+            {i < 4 ? count : "0"}
           </button>
         ))}
-        <button className="button ml-auto px-3 py-1 border rounded" onClick={() => navigate(`/posts/${post.id}`)}>View</button>
+        <button className="button" onClick={() => navigate(`/posts/${post.id}`)}>View</button>
       </div>
-    </article>
+    </div>
   );
 }
 
@@ -134,18 +130,18 @@ function PostDetails({ posts, updatePost, users }) {
   };
 
   return (
-    <div className="p-4 border rounded max-w-2xl">
+    <div className="post">
       {!editing ? (
         <>
           <h2>{post.title}</h2>
           <p>{post.content}</p>
-          <button className="button px-3 py-1 border rounded mt-2" onClick={() => setEditing(true)}>Edit</button>
+          <button className="button" onClick={() => setEditing(true)}>Edit</button>
         </>
       ) : (
         <>
-          <input id="postTitle" value={title} onChange={(e) => setTitle(e.target.value)} className="block w-full border p-2 mt-1" />
-          <textarea id="postContent" value={content} onChange={(e) => setContent(e.target.value)} className="block w-full border p-2 mt-1" />
-          <button onClick={save} className="button px-3 py-1 border rounded mt-2">Save</button>
+          <input id="postTitle" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <textarea id="postContent" value={content} onChange={(e) => setContent(e.target.value)} />
+          <button className="button" onClick={save}>Save</button>
         </>
       )}
     </div>
@@ -163,15 +159,15 @@ function Users({ posts, users }) {
   };
 
   return (
-    <div className="grid grid-cols-3 gap-6">
+    <div>
       <ul>
         {users.map((u) => (
-          <li key={u.id} onClick={() => handleSelectUser(u)} className="cursor-pointer">{u.name}</li>
+          <li key={u.id} onClick={() => handleSelectUser(u)}>{u.name}</li>
         ))}
       </ul>
       <ul>
         {userPosts.map((p) => (
-          <li key={p.id}>{p.title}</li>
+          <li key={p.id} className="post">{p.title}</li>
         ))}
       </ul>
     </div>
