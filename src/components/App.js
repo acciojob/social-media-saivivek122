@@ -4,7 +4,7 @@ import "./../styles/App.css";
 
 export default function App() {
   return (
-    <div className="App p-4">
+    <div className="App p-4"> 
       <Header />
       <main className="mt-6">
         <Routes>
