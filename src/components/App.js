@@ -5,7 +5,7 @@ import "./../styles/App.css";
 const initialUsers = [
   { id: "u1", name: "Alice" },
   { id: "u2", name: "Bob" },
-  { id: "u3", name: "Charlie" },
+  { id: "u3", name: "Charlie" }, 
 ];
 
 let initialPosts = [
