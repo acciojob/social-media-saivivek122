@@ -5,9 +5,7 @@ import "./../styles/App.css";
 export default function App() {
   const [posts, setPosts] = useState([
     { id: 1, title: "Hello World", author: "User1", content: "This is first post", reactions: [0,0,0,0,0] },
-    { id: 2, title: "Second Post", author: "User2", content: "Another post content", reactions: [0,0,0,0,0] },
   ]);
-
   const [notifications, setNotifications] = useState([]);
   const [users] = useState(["User1", "User2", "User3"]);
   const navigate = useNavigate();
@@ -18,14 +16,7 @@ export default function App() {
     const author = e.target.postAuthor.value;
     const content = e.target.postContent.value;
     if(title && author && content){
-      const newPost = {
-        id: posts.length + 1,
-        title,
-        author,
-        content,
-        reactions: [0,0,0,0,0],
-      };
-      setPosts([...posts, newPost]);
+      setPosts([...posts, { id: posts.length+1, title, author, content, reactions: [0,0,0,0,0] }]);
       e.target.reset();
       navigate("/");
     }
@@ -47,12 +38,10 @@ export default function App() {
     navigate("/");
   };
 
-  const refreshNotifications = () => {
-    setNotifications(["Notification 1", "Notification 2"]);
-  };
+  const refreshNotifications = () => setNotifications(["Notification 1", "Notification 2"]);
 
   return (
-    <div>
+    <div className="App">
       <h1>GenZ</h1>
       <nav>
         <a href="/">Posts</a>
@@ -65,22 +54,18 @@ export default function App() {
           <div>
             <form onSubmit={addPost}>
               <input id="postTitle" placeholder="Title" />
-              <select id="postAuthor">
-                {users.map(u => <option key={u}>{u}</option>)}
-              </select>
+              <select id="postAuthor">{users.map(u => <option key={u}>{u}</option>)}</select>
               <textarea id="postContent" placeholder="Content"></textarea>
-              <button type="submit">Add Post</button>
+              <button type="submit" className="button">Add Post</button>
             </form>
             <div className="posts-list">
-              {posts.map((post, i) => (
+              {posts.map(post => (
                 <div key={post.id} className="post">
                   <h3>{post.title}</h3>
                   <p>{post.content}</p>
                   <p>Author: {post.author}</p>
                   <div>
-                    {post.reactions.map((r, idx) => (
-                      <button key={idx} onClick={() => incrementReaction(post.id, idx)}>{r}</button>
-                    ))}
+                    {post.reactions.map((r,i) => <button key={i} onClick={() => incrementReaction(post.id,i)}>{r}</button>)}
                   </div>
                   <button className="button" onClick={() => navigate(`/posts/${post.id}`)}>Edit</button>
                 </div>
@@ -92,9 +77,7 @@ export default function App() {
         <Route path="/posts/:id" element={<EditPost posts={posts} updatePost={updatePost} />} />
 
         <Route path="/users" element={
-          <ul>
-            {users.map((u, i) => <li key={i}>{u}</li>)}
-          </ul>
+          <ul>{users.map((u,i) => <li key={i}>{u}</li>)}</ul>
         }/>
 
         <Route path="/notifications" element={
@@ -117,9 +100,7 @@ function EditPost({ posts, updatePost }) {
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
 
-  const handleSave = () => {
-    updatePost(post.id, title, content);
-  };
+  const handleSave = () => updatePost(post.id, title, content);
 
   return (
     <div className="post">
