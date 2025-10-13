@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import "./../styles/App.css";
 
-export default function App() {
+export default function App() { 
   return (
     <div className="App p-4"> 
       <Header />
