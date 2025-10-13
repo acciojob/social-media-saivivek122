@@ -46,11 +46,11 @@ export default function App() {
     <div className="App">
       <h1>GenZ</h1>
 
-      <nav>
+    <button className="button" onClick={() => updatePost(post.id, title, content)}>Save</button>
         <a href="/">Posts</a>
         <a href="/users">Users</a>
         <a href="/notifications">Notifications</a>
-      </nav>
+  
 
       <Routes>
         <Route path="/" element={
@@ -83,6 +83,8 @@ export default function App() {
         <Route path="/users" element={
           <ul>
             {users.map((user, idx) => <li key={idx}>{user}</li>)}
+                       <li></li>
+                       
           </ul>
         }/>
 
