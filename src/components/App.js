@@ -7,8 +7,8 @@ export default function App() {
 
   const [users] = useState(["User1", "User2", "User3"]);
   const [posts, setPosts] = useState([
-    { id: 1, title: "Post 1", author: "User1", content: "Content 1", reactions: [0, 0, 0, 0, 0] },
-    { id: 2, title: "Post 2", author: "User2", content: "Content 2", reactions: [0, 0, 0, 0, 0] }
+    { id: 1, title: "Post 1", author: "User1", content: "Content 1", reactions: [0,0,0,0,0] },
+    { id: 2, title: "Post 2", author: "User2", content: "Content 2", reactions: [0,0,0,0,0] }
   ]);
   const [notifications, setNotifications] = useState([]);
 
@@ -17,15 +17,8 @@ export default function App() {
     const title = e.target.postTitle.value;
     const author = e.target.postAuthor.value;
     const content = e.target.postContent.value;
-    if (title && author && content) {
-      const newPost = {
-        id: posts.length + 1,
-        title,
-        author,
-        content,
-        reactions: [0, 0, 0, 0, 0]
-      };
-      setPosts([...posts, newPost]);
+    if(title && author && content) {
+      setPosts([...posts, {id: posts.length+1, title, author, content, reactions: [0,0,0,0,0]}]);
       e.target.reset();
       navigate("/");
     }
@@ -33,17 +26,17 @@ export default function App() {
 
   const incrementReaction = (postId, index) => {
     setPosts(posts.map(post => {
-      if (post.id === postId && index < 4) {
+      if(post.id === postId && index < 4) {
         const newReactions = [...post.reactions];
         newReactions[index]++;
-        return { ...post, reactions: newReactions };
+        return {...post, reactions: newReactions};
       }
       return post;
     }));
   };
 
   const updatePost = (id, title, content) => {
-    setPosts(posts.map(post => post.id === id ? { ...post, title, content } : post));
+    setPosts(posts.map(post => post.id === id ? {...post, title, content} : post));
     navigate("/");
   };
 
@@ -52,6 +45,7 @@ export default function App() {
   return (
     <div className="App">
       <h1>GenZ</h1>
+
       <nav>
         <a href="/">Posts</a>
         <a href="/users">Users</a>
@@ -62,7 +56,7 @@ export default function App() {
         <Route path="/" element={
           <div>
             <form onSubmit={addPost}>
-              <input id="postTitle" placeholder="Title" />
+              <input id="postTitle" placeholder="Title"/>
               <select id="postAuthor">{users.map(u => <option key={u}>{u}</option>)}</select>
               <textarea id="postContent" placeholder="Content"></textarea>
               <button type="submit" className="button">Add Post</button>
@@ -82,15 +76,15 @@ export default function App() {
               ))}
             </div>
           </div>
-        } />
+        }/>
 
-        <Route path="/posts/:id" element={<EditPost posts={posts} updatePost={updatePost} />} />
+        <Route path="/posts/:id" element={<EditPost posts={posts} updatePost={updatePost}/>}/>
 
         <Route path="/users" element={
           <ul>
             {users.map((user, idx) => <li key={idx}>{user}</li>)}
           </ul>
-        } />
+        }/>
 
         <Route path="/notifications" element={
           <div>
@@ -99,26 +93,23 @@ export default function App() {
               {notifications.map((n,i) => <div key={i}>{n}</div>)}
             </section>
           </div>
-        } />
+        }/>
       </Routes>
     </div>
   );
 }
 
-function EditPost({ posts, updatePost }) {
-  const { id } = useParams();
-  const navigate = useNavigate();
+function EditPost({posts, updatePost}) {
+  const {id} = useParams();
   const post = posts.find(p => p.id === parseInt(id));
-  const [title, setTitle] = useState(post.title);
-  const [content, setContent] = useState(post.content);
-
-  const handleSave = () => updatePost(post.id, title, content);
+  const [title, setTitle] = useState(post?.title || "");
+  const [content, setContent] = useState(post?.content || "");
 
   return (
     <div className="post">
-      <input id="postTitle" value={title} onChange={e => setTitle(e.target.value)} />
-      <textarea id="postContent" value={content} onChange={e => setContent(e.target.value)} />
-      <button className="button" onClick={handleSave}>Save</button>
+      <input id="postTitle" value={title} onChange={e => setTitle(e.target.value)}/>
+      <textarea id="postContent" value={content} onChange={e => setContent(e.target.value)}/>
+      <button className="button" onClick={() => updatePost(post.id, title, content)}>Save</button>
     </div>
   );
 }
