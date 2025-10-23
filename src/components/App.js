@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useParams, Link, useNavigate } from "react-router-dom";
 
-const App = () => {
+const App = () => { 
 
   const initialUsers = [
     { id: 1, name: "Alice" },
