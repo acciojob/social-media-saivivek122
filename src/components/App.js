@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useParams, Link, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from "react-router-dom";
 
 const App = () => { 
 
@@ -54,12 +54,12 @@ const App = () => {
             <p>{post.content}</p>
             <div>
               {post.reactions.map((r, i) => (
-                <button key={i} onClick={() => reactToPost(post.id, i)}>
+                <button key={i} className="button" onClick={() => reactToPost(post.id, i)}>
                   {i < 4 ? `❤️ ${r}` : `🚫 0`}
                 </button>
               ))}
             </div>
-            <button onClick={() => navigate(`/edit/${post.id}`)}>Edit</button>
+            <button className="button" onClick={() => navigate(`/edit/${post.id}`)}>Edit</button>
           </div>
         ))}
       </div>
@@ -72,7 +72,7 @@ const App = () => {
       <ul>
         {users.map(u => (
           <li key={u.id}>
-            <Link to={`/users/${u.id}`}>{u.name}</Link>
+            <a href={`/users/${u.id}`} className="button">{u.name}</a>
           </li>
         ))}
       </ul>
@@ -128,7 +128,7 @@ const App = () => {
           {users.map(u => <option key={u.id}>{u.name}</option>)}
         </select>
         <textarea id="postContent" placeholder="Content" value={content} onChange={e => setContent(e.target.value)} />
-        <button onClick={handleSubmit}>Submit</button>
+        <button className="button" onClick={handleSubmit}>Submit</button>
       </div>
     );
   };
@@ -149,7 +149,7 @@ const App = () => {
         <h2>Edit Post</h2>
         <input id="postTitle" value={title} onChange={e => setTitle(e.target.value)} />
         <textarea id="postContent" value={content} onChange={e => setContent(e.target.value)} />
-        <button onClick={handleSave}>Save</button>
+        <button className="button" onClick={handleSave}>Save</button>
       </div>
     );
   };
@@ -158,10 +158,10 @@ const App = () => {
     <div className="App">
       <h1>GenZ</h1>
       <nav>
-        <Link to="/">Posts</Link> | 
-        <Link to="/users">Users</Link> | 
-        <Link to="/notifications">Notifications</Link> | 
-        <Link to="/create">Create Post</Link>
+        <a href="/" className="button">Posts</a> | 
+        <a href="/users" className="button">Users</a> | 
+        <a href="/notifications" className="button">Notifications</a> | 
+        <a href="/create" className="button">Create Post</a>
       </nav>
 
       <Routes>
