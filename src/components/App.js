@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useParams, Link, useNavigate } from "react-router-dom";
 
@@ -21,20 +20,17 @@ const App = () => {
 
   const navigate = useNavigate();
 
-
   const addPost = (post) => {
     setPosts([{ id: posts.length + 1, reactions: [0,0,0,0,0], ...post }, ...posts]);
   };
-
 
   const updatePost = (updated) => {
     setPosts(posts.map(p => p.id === updated.id ? updated : p));
   };
 
-
   const reactToPost = (postId, index) => {
     setPosts(posts.map(p => {
-      if (p.id === postId && index < 4) {
+      if (p.id === postId) {
         const newReactions = [...p.reactions];
         newReactions[index]++;
         return { ...p, reactions: newReactions };
@@ -43,12 +39,9 @@ const App = () => {
     }));
   };
 
- 
   const refreshNotifications = () => {
     setNotifications(["New comment!", "Post liked!", "New follower!"]);
   };
-
-
 
   const LandingPage = () => (
     <div>
@@ -79,13 +72,13 @@ const App = () => {
       <ul>
         {users.map(u => (
           <li key={u.id}>
-            <a href={`/users/${u.id}`}>{u.name}</a>
+            <Link to={`/users/${u.id}`}>{u.name}</Link>
           </li>
         ))}
       </ul>
 
       <Routes>
-        <Route path="/users/:id" element={<UserPosts />} />
+        <Route path=":id" element={<UserPosts />} />
       </Routes>
     </div>
   );
@@ -165,10 +158,10 @@ const App = () => {
     <div className="App">
       <h1>GenZ</h1>
       <nav>
-        <a href="/">Posts</a> | 
-        <a href="/users">Users</a> | 
-        <a href="/notifications">Notifications</a> | 
-        <a href="/create">Create Post</a>
+        <Link to="/">Posts</Link> | 
+        <Link to="/users">Users</Link> | 
+        <Link to="/notifications">Notifications</Link> | 
+        <Link to="/create">Create Post</Link>
       </nav>
 
       <Routes>
@@ -182,7 +175,6 @@ const App = () => {
   );
 };
 
-// Wrap App with Router
 export default function AppWrapper() {
   return (
     <Router>
