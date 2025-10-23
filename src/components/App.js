@@ -1,9 +1,9 @@
-// components/App.js
+
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useParams, Link, useNavigate } from "react-router-dom";
 
 const App = () => {
-  // Dummy data
+
   const initialUsers = [
     { id: 1, name: "Alice" },
     { id: 2, name: "Bob" },
@@ -21,17 +21,17 @@ const App = () => {
 
   const navigate = useNavigate();
 
-  // Add post
+
   const addPost = (post) => {
     setPosts([{ id: posts.length + 1, reactions: [0,0,0,0,0], ...post }, ...posts]);
   };
 
-  // Update post
+
   const updatePost = (updated) => {
     setPosts(posts.map(p => p.id === updated.id ? updated : p));
   };
 
-  // Increase reaction count
+
   const reactToPost = (postId, index) => {
     setPosts(posts.map(p => {
       if (p.id === postId && index < 4) {
@@ -43,12 +43,12 @@ const App = () => {
     }));
   };
 
-  // Refresh notifications
+ 
   const refreshNotifications = () => {
     setNotifications(["New comment!", "Post liked!", "New follower!"]);
   };
 
-  // --- Components as inner functions ---
+
 
   const LandingPage = () => (
     <div>
